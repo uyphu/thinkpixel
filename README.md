@@ -1,1 +1,1 @@
-# thinkpixel
+# Source code for ThinkPixel MVP
