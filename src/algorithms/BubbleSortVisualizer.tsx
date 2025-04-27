@@ -198,24 +198,24 @@ const BubbleSortVisualizer = ({
       <div className="flex items-end justify-center h-96 w-full max-w-6xl bg-gray-100 rounded-lg p-4 shadow-inner">
         {bars.map((bar, index) => (
           <motion.div
-            key={index}
-            layout
-            transition={{ type: "spring", stiffness: 150 }}
-            className={`w-8 mx-1 relative transition-colors duration-300 ${
-              bar.state === "comparing"
-                ? "bg-yellow-400"
-                : bar.state === "swapping"
-                ? "bg-red-500"
-                : bar.state === "sorted"
-                ? "bg-green-400"
-                : "bg-blue-400"
-            }`}
-            style={{ height: `${bar.value}px` }}
-          >
-            <span className="absolute bottom-full mb-1 text-xs font-mono w-full text-center">
-              {bar.value}
-            </span>
-          </motion.div>
+          key={index}
+          layout
+          transition={{ type: "spring", stiffness: 150 }}
+          className={`w-8 mx-1 relative transition-colors duration-300 ease-in-out ${
+            bar.state === "comparing"
+              ? "bg-yellow-400"
+              : bar.state === "swapping"
+              ? "bg-red-500"
+              : bar.state === "sorted"
+              ? "bg-green-400"
+              : "bg-blue-400"
+          }`}
+          style={{ height: `${bar.value}px` }}
+        >
+          <span className="absolute bottom-full mb-1 text-xs font-mono w-full text-center">
+            {bar.value}
+          </span>
+        </motion.div>
         ))}
       </div>
     </div>
