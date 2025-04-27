@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 
 interface Bar {
@@ -23,19 +23,38 @@ const BubbleSortVisualizer = ({
   stepMode,
   stepSignal,
 }: BubbleSortVisualizerProps) => {
+  const isPausedRef = useRef(isPaused);
+  const isStepModeRef = useRef(stepMode);
+  const stepSignalRef = useRef(stepSignal);
+  const isSortingNow = useRef(false);
+  const shouldStopRef = useRef(false);
+
   const [bars, setBars] = useState<Bar[]>([]);
   const [speed, setSpeed] = useState(300);
   const [stats, setStats] = useState({ comparisons: 0, swaps: 0, passes: 0 });
-  const [isWaitingForStep, setIsWaitingForStep] = useState(false);
 
-  // Sync bars with prop array
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
+
+  useEffect(() => {
+    isStepModeRef.current = stepMode;
+  }, [stepMode]);
+
+  useEffect(() => {
+    stepSignalRef.current = stepSignal;
+  }, [stepSignal]);
+
   useEffect(() => {
     setBars(array.map((value) => ({ value, state: "default" })));
     setStats({ comparisons: 0, swaps: 0, passes: 0 });
-    setIsWaitingForStep(false);
   }, [array]);
 
-  // Handle sorting when isSorting or stepSignal changes
+  useEffect(() => {
+    shouldStopRef.current = true;
+    isSortingNow.current = false;
+  }, [array]);
+
   useEffect(() => {
     if (isSorting && (!isPaused || (stepMode && stepSignal > 0))) {
       bubbleSort();
@@ -44,81 +63,97 @@ const BubbleSortVisualizer = ({
 
   const bubbleSort = async () => {
     if (!array.length) return;
+    if (isSortingNow.current) return;
+
+    shouldStopRef.current = false; // Reset when new sort starts
+    isSortingNow.current = true;
 
     let arr = [...bars];
-    let hasChanged = false;
 
-    for (let i = stats.passes; i < arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
+      if (shouldStopRef.current) {
+        isSortingNow.current = false;
+        return;
+      }
       for (let j = 0; j < arr.length - i - 1; j++) {
-        // In step mode, pause after each comparison/swap
-        if (stepMode && isWaitingForStep) {
-          while (isWaitingForStep && stepSignal === 0) {
-            await new Promise((resolve) => setTimeout(resolve, 100));
-          }
-          setIsWaitingForStep(false);
+        if (shouldStopRef.current) {
+          isSortingNow.current = false;
+          return;
         }
 
-        // Check for pause
-        if (isPaused && !stepMode) {
-          while (isPaused && !stepMode) {
-            await new Promise((resolve) => setTimeout(resolve, 100));
-          }
-        }
+        await checkPause();
 
-        // Highlight comparing bars
         arr = updateBarStates(arr, j, "comparing");
         setBars([...arr]);
-        setStats((s) => ({ ...s, comparisons: s.comparisons + 1 }));
-        hasChanged = true;
+        setStats((s) => ({ ...s, comparisons: (s.comparisons + 1) }));
+
         await delay(speed);
 
-        if (stepMode) {
-          setIsWaitingForStep(true);
-          return; // Pause for user to click Step
+        if (isStepModeRef.current && stepSignalRef.current > 0) {
+          stepSignalRef.current--;
         }
 
         if (arr[j].value > arr[j + 1].value) {
-          // Swap bars with animation
+          await checkPause();
+
           arr = updateBarStates(arr, j, "swapping");
           setBars([...arr]);
           await delay(speed);
 
           [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-          setStats((s) => ({ ...s, swaps: s.swaps + 1 }));
-          hasChanged = true;
+          setStats((s) => ({ ...s, swaps: (s.swaps + 1) }));
 
-          if (stepMode) {
-            setIsWaitingForStep(true);
-            return; // Pause for user to click Step
+          if (isStepModeRef.current && stepSignalRef.current > 0) {
+            stepSignalRef.current--;
           }
         }
 
-        // Reset non-sorted bars
+        await checkPause();
+
         arr = resetBarStates(arr, j);
         setBars([...arr]);
         await delay(speed);
+
+        if (isStepModeRef.current && stepSignalRef.current > 0) {
+          stepSignalRef.current--;
+        }
       }
 
-      // Mark sorted element
       arr[arr.length - 1 - i].state = "sorted";
       setBars([...arr]);
-      setStats((s) => ({ ...s, passes: s.passes + 1 }));
-      hasChanged = true;
-
-      if (stepMode) {
-        setIsWaitingForStep(true);
-        return; // Pause for user to click Step
-      }
+      setStats((s) => ({ ...s, passes: (s.passes + 1) }));
     }
 
-    // Mark all as sorted
-    if (hasChanged) {
-      setBars(arr.map((bar) => ({ ...bar, state: "sorted" })));
-      setArray(arr.map((bar) => bar.value));
+    setBars(arr.map((bar) => ({ ...bar, state: "sorted" })));
+    setArray(arr.map((bar) => bar.value));
+    isSortingNow.current = false;
+  };
+
+  const checkPause = async () => {
+    while (isPausedRef.current && !isStepModeRef.current) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    if (isStepModeRef.current) {
+      while (stepSignalRef.current <= 0) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
     }
   };
 
-  // Helper functions
+  const delay = async (ms: number) => {
+    const interval = 50;
+    const iterations = Math.ceil(ms / interval);
+
+    for (let i = 0; i < iterations; i++) {
+      if (isPausedRef.current && !isStepModeRef.current) {
+        while (isPausedRef.current && !isStepModeRef.current) {
+          await new Promise((resolve) => setTimeout(resolve, interval));
+        }
+      }
+      await new Promise((resolve) => setTimeout(resolve, interval));
+    }
+  };
+
   const updateBarStates = (arr: Bar[], index: number, state: Bar["state"]) => {
     const newArr = [...arr];
     newArr[index].state = state;
@@ -129,12 +164,9 @@ const BubbleSortVisualizer = ({
   const resetBarStates = (arr: Bar[], index: number) => {
     const newArr = [...arr];
     if (newArr[index].state !== "sorted") newArr[index].state = "default";
-    if (newArr[index + 1].state !== "sorted")
-      newArr[index + 1].state = "default";
+    if (newArr[index + 1].state !== "sorted") newArr[index + 1].state = "default";
     return newArr;
   };
-
-  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   return (
     <div className="flex flex-col items-center w-full p-8">
