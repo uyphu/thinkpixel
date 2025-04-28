@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import BubbleSortVisualizer from "../algorithms/BubbleSortVisualizer";
 import SelectionSortVisualizer from "../algorithms/SelectionSortVisualizer";
+import InsertionSortVisualizer from "../algorithms/InsertionSortVisualizer";
 
 // Mapping of algorithm names to their visualizer components
 const algorithmMap: Record<string, React.ComponentType<any>> = {
   "bubble-sort": BubbleSortVisualizer,
   "selection-sort": SelectionSortVisualizer,
+  "insertion-sort": InsertionSortVisualizer, 
 };
 
 const Visualizer = () => {
