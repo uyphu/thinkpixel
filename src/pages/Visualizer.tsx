@@ -2,10 +2,12 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import BubbleSortVisualizer from "../algorithms/BubbleSortVisualizer";
+import SelectionSortVisualizer from "../algorithms/SelectionSortVisualizer";
 
 // Mapping of algorithm names to their visualizer components
 const algorithmMap: Record<string, React.ComponentType<any>> = {
   "bubble-sort": BubbleSortVisualizer,
+  "selection-sort": SelectionSortVisualizer,
 };
 
 const Visualizer = () => {
@@ -86,7 +88,7 @@ const Visualizer = () => {
             stepSignal={stepSignal}
           />
         ) : (
-          <p class className="text-red-500">Algorithm not found</p>
+          <p className="text-red-500">Algorithm not found</p>
         )}
 
         {/* Control Buttons */}
