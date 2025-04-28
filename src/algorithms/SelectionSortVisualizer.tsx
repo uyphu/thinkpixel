@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 
 interface Bar {
   value: number;
-  state: "default" | "comparing" | "swapping" | "sorted";
+  state: "default" | "comparing" | "swapping" | "highlighted-min" | "sorted";
 }
 
-interface BubbleSortVisualizerProps {
+interface SelectionSortVisualizerProps {
   array: number[];
   setArray: React.Dispatch<React.SetStateAction<number[]>>;
   isSorting: boolean;
@@ -15,14 +15,14 @@ interface BubbleSortVisualizerProps {
   stepSignal: number;
 }
 
-const BubbleSortVisualizer = ({
+const SelectionSortVisualizer = ({
   array,
   setArray,
   isSorting,
   isPaused,
   stepMode,
   stepSignal,
-}: BubbleSortVisualizerProps) => {
+}: SelectionSortVisualizerProps) => {
   const isPausedRef = useRef(isPaused);
   const isStepModeRef = useRef(stepMode);
   const stepSignalRef = useRef(stepSignal);
@@ -57,15 +57,15 @@ const BubbleSortVisualizer = ({
 
   useEffect(() => {
     if (isSorting && (!isPaused || (stepMode && stepSignal > 0))) {
-      bubbleSort();
+      selectionSort();
     }
   }, [isSorting, isPaused, stepMode, stepSignal]);
 
-  const bubbleSort = async () => {
+  const selectionSort = async () => {
     if (!array.length) return;
     if (isSortingNow.current) return;
 
-    shouldStopRef.current = false; // Reset when new sort starts
+    shouldStopRef.current = false;
     isSortingNow.current = true;
 
     let arr = [...bars];
@@ -75,7 +75,10 @@ const BubbleSortVisualizer = ({
         isSortingNow.current = false;
         return;
       }
-      for (let j = 0; j < arr.length - i - 1; j++) {
+
+      let minIndex = i;
+
+      for (let j = i + 1; j < arr.length; j++) {
         if (shouldStopRef.current) {
           isSortingNow.current = false;
           return;
@@ -84,44 +87,35 @@ const BubbleSortVisualizer = ({
         await checkPause();
 
         arr = updateBarStates(arr, j, "comparing");
+        arr = updateBarStates(arr, minIndex, "highlighted-min");
         setBars([...arr]);
         setStats((s) => ({ ...s, comparisons: (s.comparisons + 1) }));
 
         await delay(speed);
 
+        if (arr[j].value < arr[minIndex].value) {
+          arr = resetBarStates(arr, minIndex);
+          minIndex = j;
+        }
+
         if (isStepModeRef.current && stepSignalRef.current > 0) {
           stepSignalRef.current--;
         }
-
-        if (arr[j].value > arr[j + 1].value) {
-          await checkPause();
-
-          arr = updateBarStates(arr, j, "swapping");
-          setBars([...arr]);
-          await delay(speed);
-
-          [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-          setStats((s) => ({ ...s, swaps: (s.swaps + 1) }));
-
-          if (isStepModeRef.current && stepSignalRef.current > 0) {
-            stepSignalRef.current--;
-          }
-        }
-
-        await checkPause();
 
         arr = resetBarStates(arr, j);
         setBars([...arr]);
-        await delay(speed);
-
-        if (isStepModeRef.current && stepSignalRef.current > 0) {
-          stepSignalRef.current--;
-        }
       }
 
-      arr[arr.length - 1 - i].state = "sorted";
+      if (minIndex !== i) {
+        [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
+        setStats((s) => ({ ...s, swaps: (s.swaps + 1) }));
+      }
+
+      arr[i].state = "sorted";
       setBars([...arr]);
       setStats((s) => ({ ...s, passes: (s.passes + 1) }));
+
+      await delay(speed);
     }
 
     setBars(arr.map((bar) => ({ ...bar, state: "sorted" })));
@@ -156,15 +150,17 @@ const BubbleSortVisualizer = ({
 
   const updateBarStates = (arr: Bar[], index: number, state: Bar["state"]) => {
     const newArr = [...arr];
-    newArr[index].state = state;
-    newArr[index + 1].state = state;
+    if (index >= 0 && index < newArr.length) {
+      newArr[index].state = state;
+    }
     return newArr;
   };
 
   const resetBarStates = (arr: Bar[], index: number) => {
     const newArr = [...arr];
-    if (newArr[index].state !== "sorted") newArr[index].state = "default";
-    if (newArr[index + 1].state !== "sorted") newArr[index + 1].state = "default";
+    if (index >= 0 && index < newArr.length && newArr[index].state !== "sorted") {
+      newArr[index].state = "default";
+    }
     return newArr;
   };
 
@@ -198,24 +194,26 @@ const BubbleSortVisualizer = ({
       <div className="flex items-end justify-center h-96 w-full max-w-6xl bg-gray-100 rounded-lg p-4 shadow-inner">
         {bars.map((bar, index) => (
           <motion.div
-          key={index}
-          layout
-          transition={{ type: "spring", stiffness: 150 }}
-          className={`w-8 mx-1 relative transition-colors duration-300 ease-in-out ${
-            bar.state === "comparing"
-              ? "bg-yellow-400"
-              : bar.state === "swapping"
-              ? "bg-red-500"
-              : bar.state === "sorted"
-              ? "bg-green-400"
-              : "bg-blue-400"
-          }`}
-          style={{ height: `${bar.value}px` }}
-        >
-          <span className="absolute bottom-full mb-1 text-xs font-mono w-full text-center">
-            {bar.value}
-          </span>
-        </motion.div>
+            key={index}
+            layout
+            transition={{ type: "spring", stiffness: 150 }}
+            className={`w-8 mx-1 relative transition-colors duration-300 ease-in-out ${
+              bar.state === "highlighted-min"
+                ? "bg-purple-500"
+                : bar.state === "comparing"
+                ? "bg-yellow-400"
+                : bar.state === "swapping"
+                ? "bg-red-500"
+                : bar.state === "sorted"
+                ? "bg-green-400"
+                : "bg-blue-400"
+            }`}
+            style={{ height: `${bar.value}px` }}
+          >
+            <span className="absolute bottom-full mb-1 text-xs font-mono w-full text-center">
+              {bar.value}
+            </span>
+          </motion.div>
         ))}
       </div>
     </div>
@@ -229,4 +227,4 @@ const StatCard = ({ label, value }: { label: string; value: number }) => (
   </div>
 );
 
-export default BubbleSortVisualizer;
+export default SelectionSortVisualizer;
