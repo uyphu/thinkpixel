@@ -7,12 +7,38 @@ interface Algorithm {
 }
 
 const algorithms: Algorithm[] = [
-  { name: "Bubble Sort", path: "/visualizer/bubble-sort", description: "Simple adjacent element swapping sort." },
-  { name: "Selection Sort", path: "/visualizer/selection-sort", description: "Select the minimum and place in order." },
-  { name: "Insertion Sort", path: "/visualizer/insertion-sort", description: "Insert each item into its proper place." },
-  { name: "Merge Sort", path: "/visualizer/merge-sort", description: "Merge each item into its proper place." },
-  { name: "Binary Search", path: "/visualizer/binary-search", description: "Efficient searching by halving the array." },
+  { 
+    name: "Bubble Sort", 
+    path: "/visualizer/bubble-sort", 
+    description: "Repeatedly swap adjacent elements if they are in the wrong order." 
+  },
+  { 
+    name: "Selection Sort", 
+    path: "/visualizer/selection-sort", 
+    description: "Select the minimum element and place it at the beginning." 
+  },
+  { 
+    name: "Insertion Sort", 
+    path: "/visualizer/insertion-sort", 
+    description: "Insert each element into its correct position in the sorted part." 
+  },
+  { 
+    name: "Merge Sort", 
+    path: "/visualizer/merge-sort", 
+    description: "Divide the array into halves, sort them, and merge back together." 
+  },
+  { 
+    name: "Quick Sort", 
+    path: "/visualizer/quick-sort", 
+    description: "Partition the array around a pivot and recursively sort subarrays." 
+  },
+  { 
+    name: "Binary Search", 
+    path: "/visualizer/binary-search", 
+    description: "Efficiently search by repeatedly dividing the array in half." 
+  },
 ];
+
 
 const AlgorithmGrid = () => {
   return (

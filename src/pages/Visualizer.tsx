@@ -5,6 +5,7 @@ import BubbleSortVisualizer from "../algorithms/BubbleSortVisualizer";
 import SelectionSortVisualizer from "../algorithms/SelectionSortVisualizer";
 import InsertionSortVisualizer from "../algorithms/InsertionSortVisualizer";
 import MergeSortVisualizer from "../algorithms/MergeSortVisualizer";
+import QuickSortVisualizer from "../algorithms/QuickSortVisualizer";
 
 // Mapping of algorithm names to their visualizer components
 const algorithmMap: Record<string, React.ComponentType<any>> = {
@@ -12,6 +13,7 @@ const algorithmMap: Record<string, React.ComponentType<any>> = {
   "selection-sort": SelectionSortVisualizer,
   "insertion-sort": InsertionSortVisualizer, 
   "merge-sort": MergeSortVisualizer,
+  "quick-sort": QuickSortVisualizer,
 };
 
 const Visualizer = () => {
