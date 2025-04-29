@@ -69,7 +69,7 @@ const InsertionSortVisualizer = ({
         shouldStopRef.current = false;
         isSortingNow.current = true;
     
-        let arr = [...bars];
+        const arr = [...bars];
     
         for (let i = 1; i < arr.length; i++) {
         if (shouldStopRef.current) {
@@ -77,7 +77,7 @@ const InsertionSortVisualizer = ({
             return;
         }
     
-        let currentBar = { ...arr[i] }; // ✅ Keep original bar safe
+        const currentBar = { ...arr[i] }; // ✅ Keep original bar safe
         let j = i - 1;
     
         arr[i].state = "highlighted-current";
