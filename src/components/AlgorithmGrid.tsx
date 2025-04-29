@@ -10,6 +10,7 @@ const algorithms: Algorithm[] = [
   { name: "Bubble Sort", path: "/visualizer/bubble-sort", description: "Simple adjacent element swapping sort." },
   { name: "Selection Sort", path: "/visualizer/selection-sort", description: "Select the minimum and place in order." },
   { name: "Insertion Sort", path: "/visualizer/insertion-sort", description: "Insert each item into its proper place." },
+  { name: "Merge Sort", path: "/visualizer/merge-sort", description: "Merge each item into its proper place." },
   { name: "Binary Search", path: "/visualizer/binary-search", description: "Efficient searching by halving the array." },
 ];
 
