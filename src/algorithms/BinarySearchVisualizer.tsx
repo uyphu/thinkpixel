@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
+import CodeBlock from "../components/CodeBlock";
 
 interface Bar {
   value: number;
@@ -192,66 +193,97 @@ const BinarySearchVisualizer = ({
   };
 
   return (
-    <div className="flex flex-col items-center w-full p-8">
-      <div className="flex gap-2 mb-4 items-center">
-        <input
-          type="text"
-          placeholder="Enter target"
-          value={targetInput}
-          onChange={(e) => {
-            setTargetInput(e.target.value);
-            setSearchStarted(false);
-            setMessage("");
-          }}
-          className="border rounded px-2 py-1 w-32"
-        />
-        <button
-          onClick={handleStartSearch}
-          disabled={searchStarted || targetInput.trim() === ""}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
-        >
-          Start Search
-        </button>
-      </div>
-
-      <div className="mb-4 text-sm text-gray-700">Speed:
-        <input
-          type="range"
-          min="50"
-          max="1000"
-          value={speed}
-          onChange={(e) => setSpeed(Number(e.target.value))}
-          className="ml-2 w-32"
-        />
-      </div>
-
-      {message && <div className="text-lg font-bold text-green-600 mb-6">{message}</div>}
-
-      <div className="flex items-end justify-center h-96 w-full max-w-6xl bg-gray-100 rounded-lg p-4 shadow-inner">
-        {bars.map((bar, index) => (
-          <motion.div
-            key={index}
-            layout
-            transition={{ type: "spring", stiffness: 150 }}
-            className={`w-8 mx-1 relative transition-colors duration-300 ease-in-out ${
-              bar.state === "comparing"
-                ? "bg-yellow-400"
-                : bar.state === "found"
-                ? "bg-green-400"
-                : bar.state === "discarded"
-                ? "bg-gray-400"
-                : "bg-blue-400"
-            }`}
-            style={{ height: `${bar.value}px` }}
+    <div className="flex flex-col lg:flex-row gap-8 w-full p-8">
+      {/* Left Panel: Controls + Visualization */}
+      <div className="flex-1 flex flex-col items-center">
+        {/* Input & Start Button */}
+        <div className="flex gap-2 mb-4 items-center">
+          <input
+            type="text"
+            placeholder="Enter target"
+            value={targetInput}
+            onChange={(e) => {
+              setTargetInput(e.target.value);
+              setSearchStarted(false);
+              setMessage("");
+            }}
+            className="border rounded px-2 py-1 w-32"
+          />
+          <button
+            onClick={handleStartSearch}
+            disabled={searchStarted || targetInput.trim() === ""}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
           >
-            <span className="absolute bottom-full mb-1 text-xs font-mono w-full text-center">
-              {bar.value}
-            </span>
-          </motion.div>
-        ))}
+            Start Search
+          </button>
+        </div>
+  
+        {/* Speed Control */}
+        <div className="mb-4 text-sm text-gray-700">
+          Speed:
+          <input
+            type="range"
+            min="50"
+            max="1000"
+            value={speed}
+            onChange={(e) => setSpeed(Number(e.target.value))}
+            className="ml-2 w-32"
+          />
+        </div>
+  
+        {/* Message */}
+        {message && (
+          <div className="text-lg font-bold text-green-600 mb-6">{message}</div>
+        )}
+  
+        {/* Visualization */}
+        <div className="flex items-end justify-center h-96 w-full bg-gray-100 rounded-lg p-4 shadow-inner overflow-x-auto">
+          {bars.map((bar, index) => (
+            <motion.div
+              key={index}
+              layout
+              transition={{ type: "spring", stiffness: 150 }}
+              className={`w-8 mx-1 relative transition-colors duration-300 ease-in-out ${
+                bar.state === "comparing"
+                  ? "bg-yellow-400"
+                  : bar.state === "found"
+                  ? "bg-green-400"
+                  : bar.state === "discarded"
+                  ? "bg-gray-400"
+                  : "bg-blue-400"
+              }`}
+              style={{ height: `${bar.value}px` }}
+            >
+              <span className="absolute bottom-full mb-1 text-xs font-mono w-full text-center">
+                {bar.value}
+              </span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+  
+      {/* Right Panel: CodeBlock */}
+      <div className="flex-1 min-w-[300px] max-w-[600px]">
+        {/* <h2 className="text-xl font-semibold mb-2 text-center">Binary Search Code</h2> */}
+        <CodeBlock codeLines={binarySearchCode} language="javascript" />
       </div>
     </div>
   );
+  
 };
+
+const binarySearchCode = [
+    "function binarySearch(arr, target) {",
+    "  let left = 0;",
+    "  let right = arr.length - 1;",
+    "  while (left <= right) {",
+    "    let mid = Math.floor((left + right) / 2);",
+    "    if (arr[mid] === target) return mid;",
+    "    else if (arr[mid] < target) left = mid + 1;",
+    "    else right = mid - 1;",
+    "  }",
+    "  return -1;",
+    "}"
+  ];
 
 export default BinarySearchVisualizer;
