@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { motion } from "framer-motion";
+import CodeBlock from "../components/CodeBlock";
 
 interface Bar {
   value: number;
@@ -175,8 +176,20 @@ const MergeSortVisualizer = ({
     isSortingNow.current = false;
   };
 
-  return (
-    <div className="flex flex-col items-center w-full p-8">
+  const leftRef = useRef<HTMLDivElement>(null);
+const [leftHeight, setLeftHeight] = useState(0);
+
+// Auto-measure height of left column
+useLayoutEffect(() => {
+  if (leftRef.current) {
+    setLeftHeight(leftRef.current.offsetHeight);
+  }
+}, [bars, stats, speed]); // optionally re-trigger if bars/stats change
+
+return (
+  <div className="flex flex-col lg:flex-row gap-8 w-full p-8">
+    {/* Left Panel: Controls, Stats, Visualization */}
+    <div className="flex-1 flex flex-col items-center" ref={leftRef}>
       {/* Controls */}
       <div className="flex flex-wrap gap-4 mb-8 items-center">
         <div className="flex items-center gap-2">
@@ -201,7 +214,7 @@ const MergeSortVisualizer = ({
       </div>
 
       {/* Visualization */}
-      <div className="flex items-end justify-center h-96 w-full max-w-6xl bg-gray-100 rounded-lg p-4 shadow-inner">
+      <div className="flex items-end justify-center h-96 w-full max-w-6xl bg-gray-100 rounded-lg p-4 shadow-inner overflow-x-auto">
         {bars.map((bar, index) => (
           <motion.div
             key={index}
@@ -225,7 +238,21 @@ const MergeSortVisualizer = ({
         ))}
       </div>
     </div>
-  );
+
+    {/* Right Panel: CodeBlock */}
+    <div className="flex-1 min-w-[300px] max-w-[600px]">
+      {/* <h2 className="text-xl font-semibold mb-2 text-center">Merge Sort Code</h2> */}
+      <div
+        className="bg-gray-900 rounded-lg shadow p-4 overflow-auto"
+        style={{ height: leftHeight }}
+      >
+        <CodeBlock codeLines={mergeSortCode} language="javascript" />
+      </div>
+    </div>
+  </div>
+);
+  
+  
 };
 
 const StatCard = ({ label, value }: { label: string; value: number }) => (
@@ -234,5 +261,31 @@ const StatCard = ({ label, value }: { label: string; value: number }) => (
     <div className="text-2xl font-bold text-blue-600">{value}</div>
   </div>
 );
+
+const mergeSortCode = [
+  "function mergeSort(arr) {",                          // 1
+  "  if (arr.length <= 1) return arr;",                 // 2
+  "  const mid = Math.floor(arr.length / 2);",          // 3
+  "  const left = mergeSort(arr.slice(0, mid));",       // 4
+  "  const right = mergeSort(arr.slice(mid));",         // 5
+  "  return merge(left, right);",                       // 6
+  "}",                                                  // 7
+  "",                                                   // 8
+  "function merge(left, right) {",                      // 9
+  "  const result = [];",                               // 10
+  "  let i = 0, j = 0;",                                 // 11
+  "  while (i < left.length && j < right.length) {",    // 12
+  "    if (left[i] < right[j]) {",                      // 13
+  "      result.push(left[i]);",                        // 14
+  "      i++;",                                         // 15
+  "    } else {",                                       // 16
+  "      result.push(right[j]);",                       // 17
+  "      j++;",                                         // 18
+  "    }",                                              // 19
+  "  }",                                                // 20
+  "  return result.concat(left.slice(i)).concat(right.slice(j));", // 21
+  "}",                                                  // 22
+];
+
 
 export default MergeSortVisualizer;

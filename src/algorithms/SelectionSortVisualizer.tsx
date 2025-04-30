@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
+import CodeBlock from "../components/CodeBlock";
 
 interface Bar {
   value: number;
@@ -165,11 +166,15 @@ const SelectionSortVisualizer = ({
   };
 
   return (
-    <div className="flex flex-col items-center w-full p-8">
-      {/* Controls */}
-      <div className="flex flex-wrap gap-4 mb-8 items-center">
-        <div className="flex items-center gap-2">
-          <label htmlFor="speed">Speed:</label>
+    <div className="flex flex-col lg:flex-row gap-8 p-8">
+      <div className="flex-1 flex flex-col items-center">
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <StatCard label="Comparisons" value={stats.comparisons} />
+          <StatCard label="Swaps" value={stats.swaps} />
+          <StatCard label="Passes" value={stats.passes} />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="speed" className="text-sm font-medium mr-2">Speed:</label>
           <input
             id="speed"
             type="range"
@@ -177,44 +182,37 @@ const SelectionSortVisualizer = ({
             max="1000"
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}
-            className="w-32"
-            aria-label="Adjust sorting speed"
+            className="w-40"
           />
+        </div>
+        <div className="flex items-end justify-center h-96 bg-gray-100 rounded-lg p-4 shadow-inner w-full">
+          {bars.map((bar, index) => (
+            <motion.div
+              key={index}
+              layout
+              transition={{ type: "spring", stiffness: 150 }}
+              className={`w-8 mx-1 relative transition-colors duration-300 ease-in-out ${
+                bar.state === "comparing"
+                  ? "bg-yellow-400"
+                  : bar.state === "swapping"
+                  ? "bg-red-500"
+                  : bar.state === "sorted"
+                  ? "bg-green-400"
+                  : "bg-blue-400"
+              }`}
+              style={{ height: `${bar.value}px` }}
+            >
+              <span className="absolute bottom-full mb-1 text-xs font-mono w-full text-center">
+                {bar.value}
+              </span>
+            </motion.div>
+          ))}
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8 w-full max-w-2xl">
-        <StatCard label="Comparisons" value={stats.comparisons} />
-        <StatCard label="Swaps" value={stats.swaps} />
-        <StatCard label="Passes" value={stats.passes} />
-      </div>
-
-      {/* Visualization */}
-      <div className="flex items-end justify-center h-96 w-full max-w-6xl bg-gray-100 rounded-lg p-4 shadow-inner">
-        {bars.map((bar, index) => (
-          <motion.div
-            key={index}
-            layout
-            transition={{ type: "spring", stiffness: 150 }}
-            className={`w-8 mx-1 relative transition-colors duration-300 ease-in-out ${
-              bar.state === "highlighted-min"
-                ? "bg-purple-500"
-                : bar.state === "comparing"
-                ? "bg-yellow-400"
-                : bar.state === "swapping"
-                ? "bg-red-500"
-                : bar.state === "sorted"
-                ? "bg-green-400"
-                : "bg-blue-400"
-            }`}
-            style={{ height: `${bar.value}px` }}
-          >
-            <span className="absolute bottom-full mb-1 text-xs font-mono w-full text-center">
-              {bar.value}
-            </span>
-          </motion.div>
-        ))}
+      <div className="flex-1 min-w-[300px] max-w-[600px]">
+        {/* <h2 className="text-xl font-semibold mb-2">Bubble Sort Code</h2> */}
+        <CodeBlock codeLines={codeLines} language="javascript" />
       </div>
     </div>
   );
@@ -226,5 +224,22 @@ const StatCard = ({ label, value }: { label: string; value: number }) => (
     <div className="text-2xl font-bold text-blue-600">{value}</div>
   </div>
 );
+
+const codeLines = [
+    "function selectionSort(arr) {",               // 1
+    "  for (let i = 0; i < arr.length - 1; i++) {",// 2
+    "    let minIndex = i;",                       // 3
+    "    for (let j = i + 1; j < arr.length; j++) {", // 4
+    "      if (arr[j] < arr[minIndex]) {",         // 5
+    "        minIndex = j;",                       // 6
+    "      }",                                     // 7
+    "    }",                                       // 8
+    "    if (minIndex !== i) {",                   // 9
+    "      [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];", // 10
+    "    }",                                       // 11
+    "  }",                                         // 12
+    "  return arr;",                               // 13
+    "}",                                           // 14
+  ];
 
 export default SelectionSortVisualizer;
