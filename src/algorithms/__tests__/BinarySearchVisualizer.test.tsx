@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { render, screen, fireEvent } from "@testing-library/react";
 import BinarySearchVisualizer from "../BinarySearchVisualizer";
 
