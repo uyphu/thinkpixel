@@ -231,7 +231,7 @@ return (
             }`}
             style={{ height: `${bar.value}px` }}
           >
-            <span className="absolute bottom-full mb-1 text-xs font-mono w-full text-center">
+            <span data-testid="bar-value" className="absolute bottom-full mb-1 text-xs font-mono w-full text-center">
               {bar.value}
             </span>
           </motion.div>
