@@ -120,7 +120,7 @@ const MergeSortVisualizer = ({
   };
 
   const performMerge = (start: number, mid: number, end: number) => {
-    let arr = [...bars];
+    const arr = [...bars];
 
     // ✅ FIX: COPY left and right parts safely
     const left = arr.slice(start, mid + 1).map((bar) => ({ ...bar }));

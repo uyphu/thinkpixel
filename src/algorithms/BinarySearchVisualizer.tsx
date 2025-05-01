@@ -25,7 +25,7 @@ interface BinarySearchVisualizerProps {
 
 const BinarySearchVisualizer = ({
   array,
-  setArray,
+  //setArray,
   isSorting,
   isPaused,
   stepMode,
