@@ -1,0 +1,16 @@
+{
+    "extends": "./tsconfig.node.json",
+    "compilerOptions": {
+      "types": ["vitest", "@testing-library/jest-dom"],
+      "jsx": "react-jsx"
+    },
+    "include": [
+      "src",
+      "src/types/react-syntax-highlighter.d.ts",
+      "src/**/*.test.ts",
+      "src/**/*.test.tsx",
+      "src/__tests__/**/*.ts",
+      "src/__tests__/**/*.tsx"
+    ]
+  }
+  

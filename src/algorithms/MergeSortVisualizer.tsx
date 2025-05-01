@@ -22,7 +22,7 @@ interface MergeSortVisualizerProps {
 
 const MergeSortVisualizer = ({
   array,
-  setArray,
+  //setArray,
   isSorting,
   isPaused,
   stepMode,

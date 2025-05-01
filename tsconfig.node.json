@@ -23,6 +23,8 @@
     "types": ["vitest"]
   },
   "include": [
+    "src", 
+    "src/types",
     "vite.config.ts",
     "src/**/*.test.ts",
     "src/**/*.test.tsx",

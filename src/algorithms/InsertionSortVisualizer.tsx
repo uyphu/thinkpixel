@@ -4,8 +4,9 @@ import CodeBlock from "../components/CodeBlock";
 
 interface Bar {
   value: number;
-  state: "default" | "comparing" | "highlighted-current" | "sorted";
+  state: "default" | "comparing" | "highlighted-current" | "sorted" | "swapping";
 }
+
 
 interface InsertionSortVisualizerProps {
   array: number[];
