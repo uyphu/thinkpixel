@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { vi } from "vitest";
 import About from "../About";
 
 // ✅ Mock Layout component exactly as imported in About.tsx

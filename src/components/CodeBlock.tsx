@@ -2,14 +2,17 @@ import React from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-
 interface CodeBlockProps {
   codeLines: string[];
   language?: string;
   highlightLine?: number;
 }
 
-const CodeBlock: React.FC<CodeBlockProps> = ({ codeLines, language = "javascript", highlightLine }) => {
+const CodeBlock: React.FC<CodeBlockProps> = ({
+  codeLines,
+  language = "javascript",
+  highlightLine,
+}) => {
   const formattedCode = codeLines.join("\n");
 
   return (
@@ -19,14 +22,13 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ codeLines, language = "javascript
         style={oneDark}
         showLineNumbers
         wrapLines
-        lineProps={(lineNumber) => {
-          return {
-            style: {
-              display: "block",
-              backgroundColor: highlightLine === lineNumber ? "rgba(255, 255, 0, 0.2)" : undefined,
-            },
-          };
-        }}
+        lineProps={(lineNumber: number) => ({
+          style: {
+            display: "block",
+            backgroundColor:
+              highlightLine === lineNumber ? "rgba(255, 255, 0, 0.2)" : undefined,
+          },
+        })}
       >
         {formattedCode}
       </SyntaxHighlighter>

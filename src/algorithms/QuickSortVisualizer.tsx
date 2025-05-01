@@ -22,7 +22,7 @@ interface QuickSortVisualizerProps {
 
 const QuickSortVisualizer = ({
   array,
-  setArray,
+  // setArray,
   isSorting,
   isPaused,
   stepMode,
