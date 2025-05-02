@@ -20,7 +20,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    "types": ["vitest"]
+    "types": ["vitest"],
+    "jsx": "react-jsx",
   },
   "include": [
     "src", 
